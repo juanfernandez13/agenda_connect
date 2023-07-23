@@ -36,10 +36,21 @@ class HttpBack4AppRepository implements Back4AppRepository {
   @override
   Future<void> atualizarContato(ContatoModel contatoModel, String id) async {
     try {
-      http.Response response = await http.patch(
+      http.Response response = await http.put(
           Uri.parse("$baseUrl/contatos/$id"),
           headers: headers,
-          body: json.encode({'favorito': contatoModel.favorito}));
+          body: json.encode({
+            'nome': contatoModel.nome,
+            'telefone': contatoModel.telefone,
+            'email': contatoModel.email,
+            'funcao': contatoModel.funcao,
+            'colorR': contatoModel.colorR,
+            'colorG': contatoModel.colorG,
+            'colorB': contatoModel.colorB,
+            'favorito': contatoModel.favorito,
+            'emergencia': contatoModel.emergencia
+          }));
+      debugPrint(response.statusCode.toString());
     } catch (err) {
       debugPrint(err.toString());
     }

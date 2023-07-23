@@ -1,4 +1,5 @@
 import 'package:agenda_connect/models/contato_model.dart';
+import 'package:agenda_connect/pages/cadastroPage/cadastro_page.dart';
 import 'package:agenda_connect/repositories/back_4app_repository.dart';
 import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,14 @@ class DetailsContact extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => CadastroPage(
+                                    contatoModel: contatoModel,
+                                  )));
+                    },
                     icon: const Icon(
                       Icons.edit,
                       color: Colors.black,

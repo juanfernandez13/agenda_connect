@@ -6,7 +6,8 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/services.dart';
 
 class CadastroPage extends StatefulWidget {
-  const CadastroPage({super.key});
+  ContatoModel? contatoModel;
+  CadastroPage({super.key, this.contatoModel});
 
   @override
   State<CadastroPage> createState() => _CadastroPageState();
@@ -20,6 +21,23 @@ class _CadastroPageState extends State<CadastroPage> {
   bool isFavorito = false;
   bool isEmergencia = false;
   Back4AppRepository httpRepository = HttpBack4AppRepository();
+  @override
+  void initState() {
+    super.initState();
+    carregarDados();
+  }
+
+  carregarDados() {
+    if (widget.contatoModel != null) {
+      isFavorito = widget.contatoModel!.favorito;
+      isEmergencia = widget.contatoModel!.emergencia;
+      nomeController.text = widget.contatoModel!.nome;
+      telefoneController.text = widget.contatoModel!.telefone;
+      emailController.text = widget.contatoModel!.email;
+      funcaoController.text = widget.contatoModel!.funcao;
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +46,11 @@ class _CadastroPageState extends State<CadastroPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xff00DFFD),
         elevation: 0,
-        title: const Text(
-          "Adicionar um contato",
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          widget.contatoModel == null
+              ? "Adicionar um contato"
+              : "Editar um contato",
+          style: const TextStyle(color: Colors.black),
         ),
         leading: InkWell(
           onTap: () => Navigator.pop(context),
@@ -148,16 +168,25 @@ class _CadastroPageState extends State<CadastroPage> {
                             InkWell(
                               onTap: () async {
                                 ContatoModel contatoModel = ContatoModel(
-                                    nome: nomeController.text,
-                                    path: "path",
-                                    telefone: telefoneController.text,
-                                    email: emailController.text,
-                                    funcao: funcaoController.text,
-                                    favorito: isFavorito,
-                                    emergencia: isEmergencia);
-                                contatoModel.gerarCor();
-                                await httpRepository
-                                    .cadastrarContato(contatoModel);
+                                  nome: nomeController.text,
+                                  path: "path",
+                                  telefone: telefoneController.text,
+                                  email: emailController.text,
+                                  funcao: funcaoController.text,
+                                  favorito: isFavorito,
+                                  emergencia: isEmergencia,
+                                );
+                                if (widget.contatoModel == null) {
+                                  contatoModel.gerarCor();
+                                  await httpRepository
+                                      .cadastrarContato(contatoModel);
+                                } else {
+                                  contatoModel.colorB = widget.contatoModel!.colorB;
+                                  contatoModel.colorG = widget.contatoModel!.colorG;
+                                  contatoModel.colorR = widget.contatoModel!.colorR;
+                                  await httpRepository.atualizarContato(
+                                      contatoModel, widget.contatoModel!.id);
+                                }
                                 Navigator.pop(context);
                               },
                               child: Container(
@@ -167,8 +196,10 @@ class _CadastroPageState extends State<CadastroPage> {
                                 decoration: BoxDecoration(
                                     color: const Color(0xff00DFFD),
                                     borderRadius: BorderRadius.circular(10)),
-                                child: const Text(
-                                  "Adicionar contato",
+                                child: Text(
+                                  widget.contatoModel == null
+                                      ? "Adicionar contato"
+                                      : "Editar contato",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
