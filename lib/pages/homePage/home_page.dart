@@ -1,5 +1,8 @@
+import 'package:agenda_connect/models/contato_model.dart';
 import 'package:agenda_connect/pages/cadastroPage/cadastro_page.dart';
 import 'package:agenda_connect/pages/homePage/details_contact.dart';
+import 'package:agenda_connect/repositories/back_4app_repository.dart';
+import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,6 +15,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<String> opcoes = ["Todos os contatos", "Emergência", "Favoritos"];
   String dropDownValue = "Todos os contatos";
+  Back4AppRepository httpRepository = HttpBack4AppRepository();
+  List<ContatoModel> contatosList = [];
+  @override
+  void initState() {
+    super.initState();
+    carregarDados();
+  }
+
+  carregarDados() async {
+    contatosList = await httpRepository.obterContatoCadastrado(dropDownValue);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,38 +66,15 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
                 child: ListView(
-              children: [
-                DetailsContact(
-                    color: Colors.amber,
-                    nome: "Juan",
-                    funcao: "Developer",
-                    email: "email@email.com",
-                    path: "s",
-                    telefone: "(85) 98714-7894",
-                    favorito: true),
-                DetailsContact(
-                    color: Colors.blue,
-                    nome: "Juan",
-                    funcao: "Developer",
-                    email: "email@email.com",
-                    path: "s",
-                    telefone: "(85) 98714-7894",
-                    favorito: false),
-                DetailsContact(
-                    color: Colors.red,
-                    nome: "Juan",
-                    funcao: "Developer",
-                    email: "email@email.com",
-                    path: "s",
-                    telefone: "(85) 98714-7894",
-                    favorito: true),
-              ],
-            )),
+                    children: contatosList.map((contato) {
+              return DetailsContact(contatoModel: contato);
+            }).toList())),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => CadastroPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => CadastroPage()));
                 },
                 child: const CircleAvatar(
                   radius: 30,

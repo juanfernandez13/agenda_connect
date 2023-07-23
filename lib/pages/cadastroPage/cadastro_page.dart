@@ -1,3 +1,6 @@
+import 'package:agenda_connect/models/contato_model.dart';
+import 'package:agenda_connect/repositories/back_4app_repository.dart';
+import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +19,7 @@ class _CadastroPageState extends State<CadastroPage> {
   TextEditingController funcaoController = TextEditingController();
   bool isFavorito = false;
   bool isEmergencia = false;
+  Back4AppRepository httpRepository = HttpBack4AppRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +146,20 @@ class _CadastroPageState extends State<CadastroPage> {
                               ],
                             ),
                             InkWell(
-                              onTap: () => Navigator.pop(context),
+                              onTap: () async {
+                                ContatoModel contatoModel = ContatoModel(
+                                    nome: nomeController.text,
+                                    path: "path",
+                                    telefone: telefoneController.text,
+                                    email: emailController.text,
+                                    funcao: funcaoController.text,
+                                    favorito: isFavorito,
+                                    emergencia: isEmergencia);
+                                contatoModel.gerarCor();
+                                await httpRepository
+                                    .cadastrarContato(contatoModel);
+                                Navigator.pop(context);
+                              },
                               child: Container(
                                 margin: const EdgeInsets.only(top: 15),
                                 padding: const EdgeInsets.symmetric(

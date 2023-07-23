@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 class ContatoModel {
+  String id = UniqueKey().toString();
   String nome = "";
   String path = "";
   String telefone = "";
@@ -21,11 +22,13 @@ class ContatoModel {
       required this.funcao,
       required this.favorito,
       required this.emergencia,
-      required this.colorR,
+      /*required this.colorR,
       required this.colorG,
-      required this.colorB});
+      required this.colorB*/
+      });
 
   ContatoModel.fromJson(Map<String, dynamic> json) {
+    id = json['objectId']; 
     nome = json['nome'];
     path = json['path'];
     telefone = json['telefone'];
@@ -53,12 +56,13 @@ class ContatoModel {
     return data;
   }
 
-  static Color gerarCor(int R, int G, int B) {
-    while (R + G + B > 450) {
-      R = Random().nextInt(255);
-      G = Random().nextInt(255);
-      B = Random().nextInt(255);
+  Color gerarCor() {
+    while ((colorR + colorG + colorB) < 450 && (colorR + colorG + colorB) == 0) {
+      colorR = Random().nextInt(255);
+      colorG = Random().nextInt(255);
+      colorB = Random().nextInt(255);
     }
-    return Color.fromARGB(255, R, G, B);
+    
+    return Color.fromARGB(255, colorR, colorG, colorB);
   }
 }
