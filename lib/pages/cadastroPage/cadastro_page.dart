@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:agenda_connect/models/contato_model.dart';
 import 'package:agenda_connect/repositories/back_4app_repository.dart';
 import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/services.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:path/path.dart';
 
+//ignore: must_be_immutable
 class CadastroPage extends StatefulWidget {
   ContatoModel? contatoModel;
   CadastroPage({super.key, this.contatoModel});
@@ -35,8 +43,43 @@ class _CadastroPageState extends State<CadastroPage> {
       telefoneController.text = widget.contatoModel!.telefone;
       emailController.text = widget.contatoModel!.email;
       funcaoController.text = widget.contatoModel!.funcao;
+      photo = XFile(widget.contatoModel!.path);
     }
     setState(() {});
+  }
+
+  XFile? photo;
+
+  cropImage(XFile imageFile) async {
+    if (imageFile.path != "") {
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          IOSUiSettings(
+            title: 'Cropper',
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        await GallerySaver.saveImage(croppedFile.path);
+        photo = XFile(croppedFile.path);
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -73,19 +116,75 @@ class _CadastroPageState extends State<CadastroPage> {
           )),
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 40, bottom: 30),
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Color(0xABFFFFFF),
+              Padding(
+                padding: const EdgeInsets.only(top: 40, bottom: 30),
+                child: InkWell(
+                  onTap: () async {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (_) {
+                          return Wrap(
+                            children: [
+                              ListTile(
+                                leading:const Icon(Icons.camera),
+                                title:const Text("Câmera"),
+                                onTap: () async {
+                                  final ImagePicker picker = ImagePicker();
+                                  photo = await picker.pickImage(
+                                      source: ImageSource.camera);
+
+                                  if (photo != null) {
+                                    String path = (await path_provider
+                                            .getApplicationDocumentsDirectory())
+                                        .path;
+                                    String name = basename(photo!.path);
+                                    photo!.saveTo("$path/$name");
+                                    await GallerySaver.saveImage(photo!.path);
+                                    cropImage(photo!);
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                              ListTile(
+                                leading: Icon(Icons.browse_gallery),
+                                title: Text("Galeria"),
+                                onTap: () async {
+                              final ImagePicker picker = ImagePicker();
+                              photo = await picker.pickImage(
+                                  source: ImageSource.gallery);
+                              Navigator.pop(context);
+                              if(photo != null){
+                                cropImage(photo!);
+                              }
+                              setState(() {});
+                            },
+                              ),
+                            ],
+                          );
+                        });
+                  },
                   child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 50,
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.black,
-                      size: 60,
-                    ),
+                    radius: 60,
+                    backgroundColor: const Color(0xABFFFFFF),
+                    child: photo != null
+                        ? Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: FileImage(File(photo!.path)),
+                                    fit: BoxFit.cover)),
+                          )
+                        : const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 50,
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.black,
+                              size: 60,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -169,7 +268,7 @@ class _CadastroPageState extends State<CadastroPage> {
                               onTap: () async {
                                 ContatoModel contatoModel = ContatoModel(
                                   nome: nomeController.text,
-                                  path: "path",
+                                  path: photo == null ? "" : photo!.path,
                                   telefone: telefoneController.text,
                                   email: emailController.text,
                                   funcao: funcaoController.text,
@@ -181,9 +280,12 @@ class _CadastroPageState extends State<CadastroPage> {
                                   await httpRepository
                                       .cadastrarContato(contatoModel);
                                 } else {
-                                  contatoModel.colorB = widget.contatoModel!.colorB;
-                                  contatoModel.colorG = widget.contatoModel!.colorG;
-                                  contatoModel.colorR = widget.contatoModel!.colorR;
+                                  contatoModel.colorB =
+                                      widget.contatoModel!.colorB;
+                                  contatoModel.colorG =
+                                      widget.contatoModel!.colorG;
+                                  contatoModel.colorR =
+                                      widget.contatoModel!.colorR;
                                   await httpRepository.atualizarContato(
                                       contatoModel, widget.contatoModel!.id);
                                 }

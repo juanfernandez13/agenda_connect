@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:agenda_connect/models/contato_model.dart';
 import 'package:agenda_connect/pages/cadastroPage/cadastro_page.dart';
 import 'package:agenda_connect/repositories/back_4app_repository.dart';
@@ -18,7 +20,15 @@ class DetailsContact extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            leading: const CircleAvatar(
+            leading: contatoModel.path != "" ?Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: FileImage(File(contatoModel.path)),
+                                    fit: BoxFit.cover)),
+                          ): CircleAvatar(
               backgroundColor: Colors.white,
               radius: 25,
               child: Icon(

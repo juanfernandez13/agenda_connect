@@ -43,6 +43,7 @@ class HttpBack4AppRepository implements Back4AppRepository {
             'nome': contatoModel.nome,
             'telefone': contatoModel.telefone,
             'email': contatoModel.email,
+            'path': contatoModel.path,
             'funcao': contatoModel.funcao,
             'colorR': contatoModel.colorR,
             'colorG': contatoModel.colorG,
