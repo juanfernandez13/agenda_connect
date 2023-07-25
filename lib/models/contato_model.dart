@@ -1,68 +1,115 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class ContatoModel {
-  String id = UniqueKey().toString();
-  String nome = "";
-  String path = "";
-  String telefone = "";
-  String email = "";
-  String funcao = "";
-  bool favorito = false;
-  bool emergencia = false;
-  int colorR = 0;
-  int colorG = 0;
-  int colorB = 0;
+class ContatoModel extends ChangeNotifier {
+  String _id = UniqueKey().toString();
+  String _nome = "";
+  String _path = "";
+  String _telefone = "";
+  String _email = "";
+  String _funcao = "";
+  bool _favorito = false;
+  bool _emergencia = false;
+  int _colorR = 0;
+  int _colorG = 0;
+  int _colorB = 0;
 
-  ContatoModel(
-      {required this.nome,
-      required this.path,
-      required this.telefone,
-      required this.email,
-      required this.funcao,
-      required this.favorito,
-      required this.emergencia,
-      /*required this.colorR,
-      required this.colorG,
-      required this.colorB*/
-      });
+  ContatoModel();
+
+  String get id => _id;
+  String get nome => _nome;
+  String get telefone => _telefone;
+  String get path => _path;
+  String get email => _nome;
+  String get funcao => _funcao;
+  bool get favorito => _favorito;
+  bool get emergencia => _emergencia;
+  int get colorR => _colorR;
+  int get colorG => _colorG;
+  int get colorB => _colorB;
+
+  set id(String value) {
+    _id = value;
+    notifyListeners();
+    }
+  set nome(String value) {
+    _nome = value;
+    notifyListeners();
+    }
+  set telefone(String value) {
+    _telefone = value;
+    notifyListeners();
+    }
+  set email(String value) {
+    _email = value;
+    notifyListeners();
+    }
+  set path(String value) {
+    _path = value;
+    notifyListeners();
+    }
+  set funcao(String value) {
+    _funcao = value;
+    notifyListeners();
+    }
+  set favorito(bool value) {
+    _favorito = value;
+    notifyListeners();
+    }
+  set emergencia(bool value) {
+    _emergencia = value;
+    notifyListeners();
+    }
+  set colorR(int value) {
+    _colorR = value;
+    notifyListeners();
+    }
+  set colorG(int value) {
+    _colorG = value;
+    notifyListeners();
+    }
+  set colorB(int value) {
+    _colorB = value;
+    notifyListeners();
+    }
 
   ContatoModel.fromJson(Map<String, dynamic> json) {
-    id = json['objectId']; 
-    nome = json['nome'];
-    path = json['path'];
-    telefone = json['telefone'];
-    email = json['email'];
-    funcao = json['funcao'];
-    favorito = json['favorito'];
-    emergencia = json['emergencia'];
-    colorR = json['colorR'];
-    colorG = json['colorG'];
-    colorB = json['colorB'];
+    _id = json['objectId'];
+    _nome = json['nome'];
+    _path = json['path'];
+    _telefone = json['telefone'];
+    _email = json['email'];
+    _funcao = json['funcao'];
+    _favorito = json['favorito'];
+    _emergencia = json['emergencia'];
+    _colorR = json['colorR'];
+    _colorG = json['colorG'];
+    _colorB = json['colorB'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nome'] = this.nome;
-    data['path'] = this.path;
-    data['telefone'] = this.telefone;
-    data['email'] = this.email;
-    data['funcao'] = this.funcao;
-    data['favorito'] = this.favorito;
-    data['emergencia'] = this.emergencia;
-    data['colorR'] = this.colorR;
-    data['colorG'] = this.colorG;
-    data['colorB'] = this.colorB;
+    data['nome'] = _nome;
+    data['path'] = _path;
+    data['telefone'] = _telefone;
+    data['email'] = _email;
+    data['funcao'] = _funcao;
+    data['favorito'] = _favorito;
+    data['emergencia'] = _emergencia;
+    data['colorR'] = _colorR;
+    data['colorG'] = _colorG;
+    data['colorB'] = _colorB;
     return data;
   }
 
   Color gerarCor() {
-    while ((colorR + colorG + colorB) < 450 && (colorR + colorG + colorB) == 0) {
-      colorR = Random().nextInt(255);
-      colorG = Random().nextInt(255);
-      colorB = Random().nextInt(255);
+    while ((_colorR + _colorG + _colorB) < 450 &&
+        (_colorR + _colorG + _colorB) == 0) {
+      _colorR = Random().nextInt(255);
+      _colorG = Random().nextInt(255);
+      _colorB = Random().nextInt(255);
     }
-    
-    return Color.fromARGB(255, colorR, colorG, colorB);
+
+    return Color.fromARGB(255, _colorR, _colorG, _colorB);
   }
 }

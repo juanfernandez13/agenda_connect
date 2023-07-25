@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:agenda_connect/models/contato_model.dart';
 import 'package:agenda_connect/repositories/back_4app_repository.dart';
+import 'package:agenda_connect/repositories/contatos_repository.dart';
 import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
@@ -11,6 +11,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 
 //ignore: must_be_immutable
 class CadastroPage extends StatefulWidget {
@@ -22,10 +23,10 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  TextEditingController nomeController = TextEditingController();
-  TextEditingController telefoneController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController funcaoController = TextEditingController();
+  TextEditingController nomeController = TextEditingController(text: "");
+  TextEditingController telefoneController = TextEditingController(text: "");
+  TextEditingController emailController = TextEditingController(text: "");
+  TextEditingController funcaoController = TextEditingController(text: "");
   bool isFavorito = false;
   bool isEmergencia = false;
   Back4AppRepository httpRepository = HttpBack4AppRepository();
@@ -43,7 +44,9 @@ class _CadastroPageState extends State<CadastroPage> {
       telefoneController.text = widget.contatoModel!.telefone;
       emailController.text = widget.contatoModel!.email;
       funcaoController.text = widget.contatoModel!.funcao;
-      photo = XFile(widget.contatoModel!.path);
+      widget.contatoModel!.path == ''
+          ? photo == null
+          : photo = XFile(widget.contatoModel!.path);
     }
     setState(() {});
   }
@@ -126,8 +129,8 @@ class _CadastroPageState extends State<CadastroPage> {
                           return Wrap(
                             children: [
                               ListTile(
-                                leading:const Icon(Icons.camera),
-                                title:const Text("Câmera"),
+                                leading: const Icon(Icons.camera),
+                                title: const Text("Câmera"),
                                 onTap: () async {
                                   final ImagePicker picker = ImagePicker();
                                   photo = await picker.pickImage(
@@ -146,18 +149,18 @@ class _CadastroPageState extends State<CadastroPage> {
                                 },
                               ),
                               ListTile(
-                                leading: Icon(Icons.browse_gallery),
-                                title: Text("Galeria"),
+                                leading: const Icon(Icons.browse_gallery),
+                                title: const Text("Galeria"),
                                 onTap: () async {
-                              final ImagePicker picker = ImagePicker();
-                              photo = await picker.pickImage(
-                                  source: ImageSource.gallery);
-                              Navigator.pop(context);
-                              if(photo != null){
-                                cropImage(photo!);
-                              }
-                              setState(() {});
-                            },
+                                  final ImagePicker picker = ImagePicker();
+                                  photo = await picker.pickImage(
+                                      source: ImageSource.gallery);
+                                  Navigator.pop(context);
+                                  if (photo != null) {
+                                    cropImage(photo!);
+                                  }
+                                  setState(() {});
+                                },
                               ),
                             ],
                           );
@@ -265,20 +268,19 @@ class _CadastroPageState extends State<CadastroPage> {
                               ],
                             ),
                             InkWell(
-                              onTap: () async {
-                                ContatoModel contatoModel = ContatoModel(
-                                  nome: nomeController.text,
-                                  path: photo == null ? "" : photo!.path,
-                                  telefone: telefoneController.text,
-                                  email: emailController.text,
-                                  funcao: funcaoController.text,
-                                  favorito: isFavorito,
-                                  emergencia: isEmergencia,
-                                );
+                              onTap: () {
+                                ContatoModel contatoModel = ContatoModel();
+                                contatoModel.nome = nomeController.text;
+                                contatoModel.telefone = telefoneController.text;
+                                contatoModel.email = emailController.text;
+                                contatoModel.path = photo == null ? "" : photo!.path;
+                                contatoModel.funcao = funcaoController.text;
+                                contatoModel.favorito = isFavorito;
+                                contatoModel.emergencia = isEmergencia;
                                 if (widget.contatoModel == null) {
                                   contatoModel.gerarCor();
-                                  await httpRepository
-                                      .cadastrarContato(contatoModel);
+                                  Provider.of<ContatoRepository>(context, listen: false)
+                                      .adicionar(contatoModel);
                                 } else {
                                   contatoModel.colorB =
                                       widget.contatoModel!.colorB;
@@ -286,8 +288,8 @@ class _CadastroPageState extends State<CadastroPage> {
                                       widget.contatoModel!.colorG;
                                   contatoModel.colorR =
                                       widget.contatoModel!.colorR;
-                                  await httpRepository.atualizarContato(
-                                      contatoModel, widget.contatoModel!.id);
+                                  Provider.of<ContatoRepository>(context, listen: false)
+                                      .alterar(widget.contatoModel!.id,contatoModel);
                                 }
                                 Navigator.pop(context);
                               },

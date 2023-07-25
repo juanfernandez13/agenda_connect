@@ -10,7 +10,7 @@ class HttpBack4AppRepository implements Back4AppRepository {
   Map<String, String> headers = {
     "X-Parse-Application-Id": dotenv.get("X_PARSE_APPLICATION_ID"),
     "X-Parse-Rest-API-Key": dotenv.get("X_PARSE_REST_API_KEY"),
-    //"Content-Type": dotenv.get("CONTENT_TYPE"),
+    "Content-Type": dotenv.get("CONTENT_TYPE"),
   };
 
   @override
@@ -36,21 +36,21 @@ class HttpBack4AppRepository implements Back4AppRepository {
   @override
   Future<void> atualizarContato(ContatoModel contatoModel, String id) async {
     try {
-      http.Response response = await http.put(
-          Uri.parse("$baseUrl/contatos/$id"),
-          headers: headers,
-          body: json.encode({
-            'nome': contatoModel.nome,
-            'telefone': contatoModel.telefone,
-            'email': contatoModel.email,
-            'path': contatoModel.path,
-            'funcao': contatoModel.funcao,
-            'colorR': contatoModel.colorR,
-            'colorG': contatoModel.colorG,
-            'colorB': contatoModel.colorB,
-            'favorito': contatoModel.favorito,
-            'emergencia': contatoModel.emergencia
-          }));
+      http.Response response =
+          await http.put(Uri.parse("$baseUrl/contatos/$id"),
+              headers: headers,
+              body: json.encode({
+                'nome': contatoModel.nome,
+                'telefone': contatoModel.telefone,
+                'email': contatoModel.email,
+                'path': contatoModel.path,
+                'funcao': contatoModel.funcao,
+                'colorR': contatoModel.colorR,
+                'colorG': contatoModel.colorG,
+                'colorB': contatoModel.colorB,
+                'favorito': contatoModel.favorito,
+                'emergencia': contatoModel.emergencia
+              }));
       debugPrint(response.statusCode.toString());
     } catch (err) {
       debugPrint(err.toString());

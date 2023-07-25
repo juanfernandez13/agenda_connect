@@ -1,9 +1,8 @@
-import 'package:agenda_connect/models/contato_model.dart';
 import 'package:agenda_connect/pages/cadastroPage/cadastro_page.dart';
 import 'package:agenda_connect/pages/homePage/details_contact.dart';
-import 'package:agenda_connect/repositories/back_4app_repository.dart';
-import 'package:agenda_connect/repositories/impl/http_back4app_repository.dart';
+import 'package:agenda_connect/repositories/contatos_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,8 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<String> opcoes = ["Todos os contatos", "Emergência", "Favoritos"];
   String dropDownValue = "Todos os contatos";
-  Back4AppRepository httpRepository = HttpBack4AppRepository();
-  List<ContatoModel> contatosList = [];
+  ContatoRepository contatoRepository = ContatoRepository();
   @override
   void initState() {
     super.initState();
@@ -24,12 +22,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   carregarDados() async {
-    contatosList = await httpRepository.obterContatoCadastrado(dropDownValue);
+    print("carregando");
+    await contatoRepository.carregarContatos(dropDownValue);
+    print(contatoRepository.contatos.length);
+    print("carregou");
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ContatoRepository>(context).carregarContatos(dropDownValue);
     return SafeArea(
         child: Scaffold(
       body: Container(
@@ -49,42 +51,46 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                     Container(
+                    Container(
                       margin: const EdgeInsets.only(top: 200),
                       decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(500), topRight: Radius.circular(500),)
-                      ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(500),
+                            topRight: Radius.circular(500),
+                          )),
                       width: 100,
                       height: 200,
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: 50, right: 50, top: 50),
-                      decoration: const BoxDecoration(
-                        color: Color(0xff00DFFD),
-                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(500), topRight: Radius.circular(500))
-
+                        margin: const EdgeInsets.only(
+                            bottom: 50, right: 50, top: 50),
+                        decoration: const BoxDecoration(
+                            color: Color(0xff00DFFD),
+                            borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(500),
+                                topRight: Radius.circular(500))),
                       ),
                     ),
+                    const Expanded(
+                      child: SizedBox(),
                     ),
-                    Expanded(child: SizedBox(),),
-
                     Container(
                       decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(500), )
-                      ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(500),
+                          )),
                       width: 200,
                       height: 200,
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 60, left: 60),
-                      decoration: const BoxDecoration(
-                        color: Color(0xff00DFFD),
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(500), )
-
+                        decoration: const BoxDecoration(
+                            color: Color(0xff00DFFD),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(500),
+                            )),
                       ),
                     ),
-                    ),
-                   
                   ],
                 )
               ],
@@ -112,11 +118,17 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                 ),
-                Expanded(
-                    child: ListView(
-                        children: contatosList.map((contato) {
-                  return DetailsContact(contatoModel: contato);
-                }).toList())),
+                Expanded(child: Consumer<ContatoRepository>(
+                    builder: (context, contatoRepository, widget) {
+                  return ListView.builder(
+                    itemCount: contatoRepository.contatos.length,
+                    itemBuilder: (context, index) {
+                      print("detalhes");
+                      var contato = contatoRepository.contatos[index];
+                      return DetailsContact(contatoModel: contato);
+                    },
+                  );
+                })),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: InkWell(
@@ -127,7 +139,10 @@ class _HomePageState extends State<HomePage> {
                     child: const CircleAvatar(
                       backgroundColor: Color(0xff00DFFD),
                       radius: 30,
-                      child: Icon(Icons.add, color: Colors.black,),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 )
