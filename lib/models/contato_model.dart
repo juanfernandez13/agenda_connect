@@ -20,7 +20,7 @@ class ContatoModel extends ChangeNotifier {
   String get nome => _nome;
   String get telefone => _telefone;
   String get path => _path;
-  String get email => _nome;
+  String get email => _email;
   String get funcao => _funcao;
   bool get favorito => _favorito;
   bool get emergencia => _emergencia;

@@ -14,20 +14,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<String> opcoes = ["Todos os contatos", "Emergência", "Favoritos"];
   String dropDownValue = "Todos os contatos";
-  ContatoRepository contatoRepository = ContatoRepository();
-  @override
-  void initState() {
-    super.initState();
-    carregarDados();
-  }
-
-  carregarDados() async {
-    print("carregando");
-    await contatoRepository.carregarContatos(dropDownValue);
-    print(contatoRepository.contatos.length);
-    print("carregou");
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,56 +31,7 @@ class _HomePageState extends State<HomePage> {
         )),
         child: Stack(
           children: [
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 200),
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(500),
-                            topRight: Radius.circular(500),
-                          )),
-                      width: 100,
-                      height: 200,
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                            bottom: 50, right: 50, top: 50),
-                        decoration: const BoxDecoration(
-                            color: Color(0xff00DFFD),
-                            borderRadius: BorderRadius.only(
-                                bottomRight: Radius.circular(500),
-                                topRight: Radius.circular(500))),
-                      ),
-                    ),
-                    const Expanded(
-                      child: SizedBox(),
-                    ),
-                    Container(
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(500),
-                          )),
-                      width: 200,
-                      height: 200,
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 60, left: 60),
-                        decoration: const BoxDecoration(
-                            color: Color(0xff00DFFD),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(500),
-                            )),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
+            const FundoHomePage(),
             Column(
               children: [
                 const Padding(
@@ -104,28 +41,33 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(fontSize: 35, fontWeight: FontWeight.w500),
                   ),
                 ),
-                DropdownButton(
-                  value: dropDownValue,
-                  items: opcoes.map((e) {
-                    return DropdownMenuItem(
-                      value: e,
-                      child: Text(e),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      dropDownValue = value ?? "Todos os contatos";
-                    });
-                  },
-                ),
+                Consumer<ContatoRepository>(
+                    builder: (_, contatoRepository, widget) {
+                  return DropdownButton(
+                    value: dropDownValue,
+                    items: opcoes.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text(e),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(
+                          () => dropDownValue = value ?? "Todos os contatos");
+                      contatoRepository.carregarContatos(dropDownValue);
+                    },
+                  );
+                }),
                 Expanded(child: Consumer<ContatoRepository>(
                     builder: (context, contatoRepository, widget) {
                   return ListView.builder(
                     itemCount: contatoRepository.contatos.length,
                     itemBuilder: (context, index) {
-                      print("detalhes");
                       var contato = contatoRepository.contatos[index];
-                      return DetailsContact(contatoModel: contato);
+                      return DetailsContact(
+                        contatoModel: contato,
+                        status: dropDownValue,
+                      );
                     },
                   );
                 })),
@@ -152,5 +94,62 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     ));
+  }
+}
+
+class FundoHomePage extends StatelessWidget {
+  const FundoHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 200),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(500),
+                    topRight: Radius.circular(500),
+                  )),
+              width: 100,
+              height: 200,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 50, right: 50, top: 50),
+                decoration: const BoxDecoration(
+                    color: Color(0xff00DFFD),
+                    borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(500),
+                        topRight: Radius.circular(500))),
+              ),
+            ),
+            const Expanded(
+              child: SizedBox(),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(500),
+                  )),
+              width: 200,
+              height: 200,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 60, left: 60),
+                decoration: const BoxDecoration(
+                    color: Color(0xff00DFFD),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(500),
+                    )),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
   }
 }

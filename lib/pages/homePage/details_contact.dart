@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 class DetailsContact extends StatelessWidget {
   final ContatoModel contatoModel;
-
-  DetailsContact({super.key, required this.contatoModel});
+  final status;
+  DetailsContact({super.key, required this.contatoModel, required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,7 @@ class DetailsContact extends StatelessWidget {
               child: IconButton(
                   onPressed: () {
                     contatoModel.favorito = !contatoModel.favorito;
-                    Provider.of<ContatoRepository>(context, listen: false).alterar(contatoModel.id, contatoModel);
+                    Provider.of<ContatoRepository>(context, listen: false).alterar(contatoModel.id, contatoModel, status:status );
 
                   },
                   icon: Icon(

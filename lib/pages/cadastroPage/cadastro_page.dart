@@ -30,6 +30,7 @@ class _CadastroPageState extends State<CadastroPage> {
   bool isFavorito = false;
   bool isEmergencia = false;
   Back4AppRepository httpRepository = HttpBack4AppRepository();
+
   @override
   void initState() {
     super.initState();
@@ -212,13 +213,7 @@ class _CadastroPageState extends State<CadastroPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            TextField(
-                              controller: nomeController,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.person),
-                                  label: Text("Nome"),
-                                  hintText: "Insira seu nome"),
-                            ),
+                            InputTextField(controller: nomeController, icon: Icons.person, hint: "Insira seu nome", label: "Nome",),
                             TextField(
                               controller: telefoneController,
                               decoration: const InputDecoration(
@@ -231,20 +226,8 @@ class _CadastroPageState extends State<CadastroPage> {
                                 TelefoneInputFormatter(),
                               ],
                             ),
-                            TextField(
-                              controller: emailController,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.email),
-                                  label: Text("E-mail"),
-                                  hintText: "Insira seu e-mail"),
-                            ),
-                            TextField(
-                              controller: funcaoController,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.work),
-                                  label: Text("Função"),
-                                  hintText: "Insira seu Função"),
-                            ),
+                            InputTextField(controller: emailController, icon: Icons.email, hint: "Insira seu email", label: "Email",),
+                            InputTextField(controller: funcaoController, icon: Icons.work, hint: "Insira sua função", label: "Função",),
                             Row(
                               children: [
                                 Checkbox(
@@ -273,13 +256,15 @@ class _CadastroPageState extends State<CadastroPage> {
                                 contatoModel.nome = nomeController.text;
                                 contatoModel.telefone = telefoneController.text;
                                 contatoModel.email = emailController.text;
-                                contatoModel.path = photo == null ? "" : photo!.path;
+                                contatoModel.path =
+                                    photo == null ? "" : photo!.path;
                                 contatoModel.funcao = funcaoController.text;
                                 contatoModel.favorito = isFavorito;
                                 contatoModel.emergencia = isEmergencia;
                                 if (widget.contatoModel == null) {
                                   contatoModel.gerarCor();
-                                  Provider.of<ContatoRepository>(context, listen: false)
+                                  Provider.of<ContatoRepository>(context,
+                                          listen: false)
                                       .adicionar(contatoModel);
                                 } else {
                                   contatoModel.colorB =
@@ -288,8 +273,10 @@ class _CadastroPageState extends State<CadastroPage> {
                                       widget.contatoModel!.colorG;
                                   contatoModel.colorR =
                                       widget.contatoModel!.colorR;
-                                  Provider.of<ContatoRepository>(context, listen: false)
-                                      .alterar(widget.contatoModel!.id,contatoModel);
+                                  Provider.of<ContatoRepository>(context,
+                                          listen: false)
+                                      .alterar(widget.contatoModel!.id,
+                                          contatoModel);
                                 }
                                 Navigator.pop(context);
                               },
@@ -320,5 +307,27 @@ class _CadastroPageState extends State<CadastroPage> {
         ),
       ),
     ));
+  }
+}
+
+class InputTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final IconData icon;
+  final String label;
+  final String hint;
+  const InputTextField(
+      {super.key,
+      required this.controller,
+      required this.icon,
+      required this.hint,
+      required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+          prefixIcon: Icon(icon), label: Text(label), hintText: hint),
+    );
   }
 }

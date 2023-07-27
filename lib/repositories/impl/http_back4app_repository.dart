@@ -15,8 +15,9 @@ class HttpBack4AppRepository implements Back4AppRepository {
 
   @override
   Future<List<ContatoModel>> obterContatoCadastrado(String status) async {
+    var query = status == "" || status == "Todos os contatos"? "" : status == "Favoritos" ? "?where={\"favorito\":true}": "?where={\"emergencia\":true}";
     var response =
-        await http.get(Uri.parse("$baseUrl/contatos"), headers: headers);
+        await http.get(Uri.parse("$baseUrl/contatos$query"), headers: headers);
     var responseDecode = json.decode(response.body);
     if (response.statusCode == 200) {
       return (responseDecode["results"] as List)

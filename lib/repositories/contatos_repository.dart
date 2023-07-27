@@ -6,30 +6,27 @@ import 'impl/http_back4app_repository.dart';
 
 class ContatoRepository extends ChangeNotifier {
   List<ContatoModel> contatos = <ContatoModel>[];
-  Back4AppRepository _httpRepository = HttpBack4AppRepository();
+  final Back4AppRepository _httpRepository = HttpBack4AppRepository();
   carregarContatos(String status) async {
-    contatos = await _httpRepository.obterContatoCadastrado("");
-  }
-
-  adicionar(ContatoModel contatoModel) async {
-    contatos.add(contatoModel);
-    await _httpRepository.cadastrarContato(contatoModel);
+    contatos = await _httpRepository.obterContatoCadastrado(status);
     notifyListeners();
   }
 
-  alterar(String id, ContatoModel contatoModel) async {
+  adicionar(ContatoModel contatoModel) async {
+    await _httpRepository.cadastrarContato(contatoModel);
+    contatos = await _httpRepository.obterContatoCadastrado("");
+    notifyListeners();
+  }
+
+  alterar(String id, ContatoModel contatoModel, {String? status}) async {
     await _httpRepository.atualizarContato(contatoModel, id);
-    var contato = contatos.firstWhere((element) => element.id == id);
-    int index = contatos.indexWhere((element) => element.id == id);
-    contato = contatoModel;
-    contatos.remove(contatos.where((element) => element.id == id).first);
-    contatos.insert(index, contato);
+    contatos = await _httpRepository.obterContatoCadastrado(status ?? "");
     notifyListeners();
   }
 
   remover(String id) async {
-    contatos.remove(contatos.where((element) => element.id == id).first);
     await _httpRepository.deletarContato(id);
+    contatos = await _httpRepository.obterContatoCadastrado("");
     notifyListeners();
   }
 }

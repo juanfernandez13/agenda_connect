@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<ContatoRepository>(create: (_) => ContatoRepository()),
-        ChangeNotifierProvider<ContatoModel>(create: (_) => ContatoModel()),
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,

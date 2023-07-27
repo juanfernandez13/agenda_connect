@@ -1,6 +1,8 @@
 import 'package:agenda_connect/pages/homePage/home_page.dart';
 import 'package:flutter/material.dart';
 
+import '../../repositories/contatos_repository.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -9,15 +11,15 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  ContatoRepository contatoRepository = ContatoRepository();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     carregarPage();
   }
 
   void carregarPage() async{
-    await Future.delayed(Duration(seconds: 1));
+    await contatoRepository.carregarContatos("");
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (_) => HomePage()));
   }
