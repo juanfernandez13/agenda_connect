@@ -3,9 +3,6 @@ import 'package:agenda_connect/repositories/contatos_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-
-import 'models/contato_model.dart';
-
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();
     await dotenv.load(fileName: ".env");

@@ -20,7 +20,7 @@ class ContatoRepository extends ChangeNotifier {
 
   alterar(String id, ContatoModel contatoModel, {String? status}) async {
     await _httpRepository.atualizarContato(contatoModel, id);
-    contatos = await _httpRepository.obterContatoCadastrado(status ?? "");
+    //contatos = await _httpRepository.obterContatoCadastrado(status ?? "");
     notifyListeners();
   }
 
